@@ -47,6 +47,8 @@ class EA:
         
             ind.append([whole, decimal])
         
+        val = self.eval(ind, decimal=True)
+        ind.append(val)
         return ind
     
     def genind_nodec(self, submats):
@@ -68,19 +70,26 @@ class EA:
     def genpool(self):
         self.pool = [self.genind_nodec(4) for i in range(self.poolsize)]
     
-    def decode(self, s):
+    def decode(self, s, decimal=False):
         val = 0
         for i in range(len(s)):
             if s[i] == '1':
                 val += 2**(4-i)
-        
+        if decimal:
+            val /= 100
         return val
     
-    def eval(self, genotype):
-        w1 = self.decode(genotype[0])
-        w2 = self.decode(genotype[1])
-        w3 = self.decode(genotype[2])
-        theta = self.decode(genotype[3])
+    def eval(self, genotype, decimal=False):
+        if decimal:
+            w1 = self.decode(genotype[0][0]) + self.decode(genotype[0][1], decimal=True)
+            w2 = self.decode(genotype[1][0]) + self.decode(genotype[1][1], decimal=True)
+            w3 = self.decode(genotype[2][0]) + self.decode(genotype[2][1], decimal=True)
+            theta = self.decode(genotype[3][0]) + self.decode(genotype[3][1], decimal=True)
+        else:
+            w1 = self.decode(genotype[0])
+            w2 = self.decode(genotype[1])
+            w3 = self.decode(genotype[2])
+            theta = self.decode(genotype[3])
         ann = AND(0, 0, w1, w2, w3, theta)
         fitness = 0
 
@@ -176,8 +185,15 @@ class EA:
 
 if __name__ == "__main__":
     ea = EA(10, 30, 0.05)
-    one = ea.genind_nodec(4)
-    two = ea.genind_nodec(4)
-    print(ea.run())
+    one = ea.genind(4)
+    two = ea.genind(4)
+    print(one)
+    print(one[0][0])
+    print(one[0][0])
+    v1 = ea.decode(one[0][0])
+    v2 = ea.decode(one[0][1], decimal=True)
+    print(v1)
+    print(v2)
+    print(v1 + v2)
 
     
