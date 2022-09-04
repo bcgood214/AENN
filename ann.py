@@ -68,7 +68,7 @@ class EA:
         return ind
     
     def genpool(self):
-        self.pool = [self.genind_nodec(4) for i in range(self.poolsize)]
+        self.pool = [self.genind(4) for i in range(self.poolsize)]
     
     def decode(self, s, decimal=False):
         val = 0
@@ -145,13 +145,20 @@ class EA:
 
         return [fittest, second_fittest]
     
-    def recombine(self, p1, p2):
+    def recombine(self, p1, p2, decimal=False):
         child = []
         for i in range(4):
-            co_point = random.randint(0, 4)
-            child.append(p1[i][:co_point]+p2[i][co_point:])
+            if decimal:
+                co_point = random.randint(0, 4)
+                new_elem = [p1[i][0][:co_point]+p2[i][0][co_point:]]
+                co_point = random.randint(0, 4)
+                new_elem.append(p1[i][1][:co_point]+p2[i][1][co_point:])
+                child.append(new_elem)
+            else:
+                co_point = random.randint(0, 4)
+                child.append(p1[i][:co_point]+p2[i][co_point:])
         
-        val = self.eval(child)
+        val = self.eval(child, decimal=decimal)
         child.append(val)
         return child
     
@@ -171,10 +178,12 @@ class EA:
         self.genpool()
 
         for g in range(self.gens):
+            if self.fittest()[-1] > 150:
+                return self.fittest()
             next_gen = []
             for j in range(len(self.pool)-1):
                 parents = self.random_ts()
-                children = self.recombine(parents[0], parents[1])
+                children = self.recombine(parents[0], parents[1], decimal=True)
                 next_gen.append(children)
             
             next_gen.append(self.fittest())
@@ -184,16 +193,7 @@ class EA:
             
 
 if __name__ == "__main__":
-    ea = EA(10, 30, 0.05)
-    one = ea.genind(4)
-    two = ea.genind(4)
-    print(one)
-    print(one[0][0])
-    print(one[0][0])
-    v1 = ea.decode(one[0][0])
-    v2 = ea.decode(one[0][1], decimal=True)
-    print(v1)
-    print(v2)
-    print(v1 + v2)
+    ea = EA(600, 120, 0.05)
+    print(ea.run())
 
     
