@@ -17,7 +17,7 @@ class AND:
     def run(self):
         sum = 0
         sum += self.x1 * self.w1
-        sum += self.is_and() * self.w2
+        sum += self.is_and() * (-1*self.w2)
         sum += self.x2 * self.w3
 
         if sum < self.theta:
